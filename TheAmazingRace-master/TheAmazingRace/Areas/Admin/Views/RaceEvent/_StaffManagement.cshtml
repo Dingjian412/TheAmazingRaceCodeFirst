@@ -1,0 +1,90 @@
+﻿@model IEnumerable<TheAmazingRace.Models.RaceEventUser>
+
+<div id="staff-management">
+    <div class="box box-warning">
+        <div class="box-header with-border">
+            <h3 class="box-title">Staff Management</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staff-modal">
+                    Add Staff
+                </button>
+            </p>
+            <div class="box">
+                <div class="box-body no-padding">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Staff Name</th>
+                            <th>Photo</th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.User.Name</td>
+                                <td>
+                                    <img src="@item.User.PhotoSource" class="img-circle" style="width:60px; margin:3px 5px;">
+                                </td>
+                                <td>
+                                    <button id="@item.User.Id" class="btn btn-danger" onclick="removeStaff(this.id)">Remove</button>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+
+            <div class="modal fade" id="staff-modal">
+                <div class="modal-dialog" style="width:50%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Add Staff to Race</h4>
+                        </div>
+                        <div class="modal-body">
+                            @Html.Action("_StaffList", "RaceEvent")
+                        </div>
+                        <div class="modal-footer" style="text-align:center;">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>
+
+<script>
+    function removeStaff(id) {
+        var res = confirm("Do you want to remove this staff from race?");
+        if (res == true) {
+            var payload = {
+                raceEventId: @Session["RaceEventId"],
+                staffId: id
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/RaceEvent/RemoveStaffFromRace",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(payload)
+            }).always(function (data) {
+                if (data.status == 200) {
+                    $("#staff-management").html(data.responseText);
+                } else {
+                    alert("An error has occured. Please try again later!");
+                }
+            });
+        };
+    }
+</script>

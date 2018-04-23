@@ -1,0 +1,84 @@
+﻿@model IEnumerable<TheAmazingRace.Models.PitStop>
+
+@{
+    ViewBag.Title = "Pit Stop Management";
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <p>
+                    <a href="@Url.Action("Create", "PitStop")" class="btn btn-primary">Create New</a>
+                </p>
+                <table id="data-table" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PitStopName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChallengeDescription)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Address)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PostalCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CreatedOn)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CreatedBy)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PitStopName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ChallengeDescription)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Address)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PostalCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreatedBy.Name)
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Edit", "PitStop", new { id = item.Id })" class="btn btn-warning"><i class="fa fa-edit"></i> <span>Edit</span></a> &nbsp;
+                                    <a href="@Url.Action("Delete", "PitStop", new { id = item.Id })" class="btn btn-danger"><i class="fa fa-times"></i> <span>Delete</span></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/datatable-js")
+
+    <script>
+        $(function () {
+            $('#data-table').DataTable()
+        })
+    </script>
+}

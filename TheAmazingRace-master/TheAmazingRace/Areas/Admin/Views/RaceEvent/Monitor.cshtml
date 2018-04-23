@@ -1,0 +1,308 @@
+﻿@model TheAmazingRace.Models.RaceEvent
+
+@{
+    ViewBag.Title = "Monitor Race Event";
+    var updatedBy = Model.UpdatedBy != null ? Model.UpdatedBy.Name : "-";
+    var updatedOn = Model.UpdatedBy != null ? Model.UpdatedOn.ToString() : "-";
+    var signalRBaseUrl = System.Configuration.ConfigurationManager.AppSettings["signalRServiceBaseUrl"];
+    var signalRHubsUrl = signalRBaseUrl + "/signalR/hubs";
+}
+
+<style>
+    #map {
+        height: 400px;
+        width: 900px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- Profile Image -->
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        @*<img class="profile-user-img img-responsive img-circle" src="../../dist/img/user4-128x128.jpg" alt="User profile picture">*@
+
+                        <h3 class="profile-username text-center">@Model.EventName</h3>
+
+                        <p class="text-muted text-center">@Model.Address</p>
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Start date/time</b> <a class="pull-right">@Model.EventDate</a>
+                            </li>
+                            @if (!Model.AdditionalInfo.IsEmpty())
+                            {
+                                <li class="list-group-item">
+                                    <b>Additional Info</b><br />
+                                    @Model.AdditionalInfo
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <b>Starting Latitude</b> <a class="pull-right">@Model.StartLatitude</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Starting Longitude</b> <a class="pull-right">@Model.StartLongitude</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Created on</b> <a class="pull-right">@Model.CreatedOn</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Last updated by</b> <a class="pull-right">@updatedBy</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Last updated on</b> <a class="pull-right">@updatedOn</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="leaderboard">
+                    @Html.Action("_Leaderboard", "RaceEvent", new { raceEventId = Model.Id })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Race Overview</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        @*@Html.Action("_GMap", "RaceEvent", new { raceEventId = Model.Id })*@
+                        <p id="map"></p>
+                        <h1 id="demo"></h1>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="leaderboard">
+                    @Html.Action("_TeamCompletePanel", "RaceEvent", new { raceEventId = Model.Id })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="/Scripts/jquery-1.10.2.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBqHbZPyZGbYZJ8nsWrn4tv01vALd-mtA&callback=initMap"></script>
+    <script src="/Scripts/jquery.signalR-2.2.3.min.js"></script>
+    <script src="@signalRHubsUrl"></script>
+    <script>
+        var map;
+        var uluru = { lat: 1.349131, lng: 103.850148 };
+        var pitStopMarker = [];
+        var staffMarker = [];
+        var teamMarker = [];
+
+        $(document).ready(function () {
+
+            $.connection.hub.url = "@signalRBaseUrl" + "/signalr";
+            var myhub = $.connection.signalRHub;
+            //console.log(myhub);
+            myhub.client.broadcast = function (event, team, x, y, ptStpPass) {
+                //check para here
+                var eventId = 1;
+                var teanid1 = 4;
+                var staffId1 = "dingjian412@gmail.com";
+                var lat1 = 1.387683;
+                var lng1 = 103.8691;
+                var type1 = "staff";
+                if (isString(staffId1) && isNumber(eventId) && isNumber(lat1) && isNumber(lng1) && isString(type1))
+                {
+                    //debugger;
+                    MessageProcessor(eventId, teanid1, staffId1, lat1, lng1, type1);
+                }
+
+            };
+
+            $.connection.hub.start().done(function() {
+
+            });
+        });
+
+        function MessageProcessor(eventId, teanid1, staffId1, lat1, lng1, type1) {
+            var para = { eventId: eventId, teamId: teanid1, staffId: staffId1, latitude: lat1, longtitude: lng1, type: type1};
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("MessageProcessor", "RaceEvent")',
+                data: JSON.stringify(para),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.result) {
+                        LoadStaffLocation();
+                        LoadTeamLocation();
+                    }
+                },
+                error: function(response) { alert(response.responseText) }
+            });
+        };
+
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'),
+                {
+                    center: uluru,
+                    zoom: 10
+                });
+            LoadTeamLocation();
+            LoadPitStopLocation();
+            LoadStaffLocation();
+            
+        };
+
+        function LoadPitStopLocation() {
+            $.get("@Url.Action("GetPitStopLocation", "RaceEvent", new { raceEventId = Model.Id })",
+                function (data) {
+                    var contentString = [];
+                    var infowindow = [];
+                    for (var i = 0; i < data.length; i++) {
+
+                        var iconName = "/Content/img/orange.png";
+                        contentString[i] = '<div id="content">'+
+                            '<h1>' + data[i].PitStop.PitStopName+'</h1>'+
+                            '</div>';
+
+                        infowindow[i] = new google.maps.InfoWindow({content: contentString[i]});
+                        var mdl = pitStopMarker[i];
+                        if (data[i].PitStop != null)
+                        {
+                            if (data[i].PitStop.Latitude != null && data[i].PitStop.Longitude != null)
+                            {
+                                pitStopMarker[i] = new google.maps.Marker(
+                                    {
+                                        position: { lat: parseFloat(data[i].PitStop.Latitude), lng: parseFloat(data[i].PitStop.Longitude) },
+                                        //position: { lat: 1.39, lng: 103.85 },
+                                        map: map,
+                                        icon: iconName
+                                    });
+                                google.maps.event.addListener(pitStopMarker[i],'click', (function (mdl, i){
+                                    return function() {
+                                        infowindow[i].open(map, pitStopMarker[i]);
+                                    }
+                                })(pitStopMarker[i],i));
+                            }
+                        }
+                    }
+                });
+        };
+        ////////////////////////////////////
+        function LoadStaffLocation() {
+            $.get("@Url.Action("GetStaffLocation", "RaceEvent", new { raceEventId = Model.Id })",
+                function (data) {
+                    var contentString = [];
+                    var infowindow = [];
+                    //debugger;
+                    ClearStaffMarker();
+                    for (var i = 0; i < data.length; i++) {
+
+                        var iconName = "/Content/img/green.png";
+                        contentString[i] = '<div id="content">'+
+                            '<h1>' + data[i].User.FirstName + '</h1>' + '<h2>' + data[i].CurrentLat + ' ' + data[i].CurrentLong+'</h2>'+'</div>';
+
+                        infowindow[i] = new google.maps.InfoWindow({content: contentString[i]});
+                        var mdl = staffMarker[i];
+                        staffMarker[i] = new google.maps.Marker(
+                            {
+                                position: { lat: parseFloat(data[i].CurrentLat), lng: parseFloat(data[i].CurrentLong) },
+                                //position: { lat: 1.39, lng: 103.85 },
+                                map: map,
+                                icon: iconName
+                            });
+                        google.maps.event.addListener(staffMarker[i], 'click', (function (mdl, i) {
+                            return function () {
+                                infowindow[i].open(map, staffMarker[i]);
+                            }
+                        })(staffMarker[i], i));
+                    }
+                });
+        };
+        function ClearStaffMarker() {
+            //debugger;
+            for (var i = 0; i < staffMarker.length; i++) {
+                staffMarker[i].setMap(null);
+            }
+            staffMarker.length = 0;
+        };
+        ////////////////////////////////////
+        function LoadTeamLocation() {
+             $.get("@Url.Action("GetTeamLocation", "RaceEvent", new { raceEventId = Model.Id })",
+                function (data) {
+                    var contentString = [];
+                    var infowindow = [];
+                    ClearTeamMarker();
+                    for (var i = 0; i < data.length; i++) {
+                        //debugger;
+                        var iconName = "/Content/img/blue.png";
+                        contentString[i] = '<div id="content">' +
+                            '<h1>' + data[i].Name + '</h1>' + '<h2>' + data[i].CurrentLat + ' ' + data[i].CurrentLong + '</h2>' + '</div>';
+                        infowindow[i] = new google.maps.InfoWindow({content: contentString[i]});
+                        var mdl = teamMarker[i];
+                        teamMarker[i] = new google.maps.Marker(
+                            {
+                                position: { lat: parseFloat(data[i].CurrentLat), lng: parseFloat(data[i].CurrentLong)},
+                                map: map,
+                                icon: iconName
+                            });
+                        google.maps.event.addListener(teamMarker[i], 'click', (function (mdl, i) {
+                            return function () {
+                                infowindow[i].open(map, teamMarker[i]);
+                            }
+                        })(teamMarker[i], i));
+                    }
+                });
+        };
+        function ClearTeamMarker() {
+            for (var i = 0; i < teamMarker.length; i++) {
+                teamMarker[i].setMap(null);
+            }
+            teamMarker.length = 0;
+        };
+        ////////////////////////////////////
+        function isString (value) {
+            return typeof value === 'string' || value instanceof String;
+        };
+        function isNumber (value) {
+            return typeof value === 'number' && isFinite(value);
+        };
+        ///////////////////////////////////
+        $(function() {
+            setInterval(function() {
+                    var raceEventId = @Model.Id;
+                    var payload = { raceEventId : raceEventId};
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/RaceEvent/_Leaderboard",
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(payload)
+                    }).always(function(data) {
+                        if (data.status == 200) {
+                            $("#leaderboard").html(data.responseText);
+                        } else {
+                            alert("An error has occured. Please try again later!");
+                        }
+                    });
+                },
+                10000);
+        });
+    </script>
+}
+

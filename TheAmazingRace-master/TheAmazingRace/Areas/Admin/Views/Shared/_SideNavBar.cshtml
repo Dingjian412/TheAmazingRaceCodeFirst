@@ -1,0 +1,125 @@
+﻿@using TheAmazingRace.Models;
+@using Microsoft.AspNet.Identity;
+
+@{
+    var controller = ViewContext.ParentActionViewContext.RouteData.Values["Controller"].ToString();
+    var action = ViewContext.ParentActionViewContext.RouteData.Values["Action"].ToString();
+    var controllerAction = controller + action;
+    var profilePicSrc = !User.Identity.GetUserEntityPhoto().IsEmpty() ? User.Identity.GetUserEntityPhoto() : Url.Content("~/Content/img/default-avatar.jpg");
+}
+
+<aside class="main-sidebar">
+
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="@profilePicSrc" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>@User.Identity.GetUserEntityFullName()</p>
+                <!-- Status -->
+                <a href="#">@User.Identity.GetMasterRoleName()</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">Menu</li>
+            <!-- Optionally, you can add icons to the links -->
+            <li class="@(controllerAction == "DashboardIndex" ? "active" : "")"><a href="@Url.Action("Index", "Dashboard")"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+
+            @if (User.Identity.GetMasterRoleName() == "Administrator")
+    {
+        <li class="treeview @(controller == "Staff" ? "active menu-open" : "")">
+            <a href="#">
+                <i class="fa fa-user-secret"></i> <span>Staff</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                <li class="@(controllerAction == "StaffManage" ? "active" : "")">
+                    <a href="@Url.Action("Manage", "Staff")"><i class="fa fa-table"></i> <span>Manage</span></a>
+                </li>
+                <li class="@(controllerAction == "StaffCreate" ? "active" : "")">
+                    <a href="@Url.Action("Create", "Staff")"><i class="fa fa-user-plus"></i> <span>Create</span></a>
+                </li>
+            </ul>
+        </li>
+}
+
+            <li class="treeview @(controller == "Participant" ? "active menu-open" : "")">
+                <a href="#">
+                    <i class="fa fa-user"></i> <span>Participant</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@(controllerAction == "ParticipantManage" ? "active" : "")">
+                        <a href="@Url.Action("Manage", "Participant")"><i class="fa fa-table"></i> <span>Manage</span></a>
+                    </li>
+                    <li class="@(controllerAction == "ParticipantCreate" ? "active" : "")">
+                        <a href="@Url.Action("Create", "Participant")"><i class="fa fa-user-plus"></i> <span>Create</span></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="treeview @(controller == "RaceEvent" ? "active menu-open" : "")">
+                <a href="#">
+                    <i class="fa fa-map"></i> <span>Race Events</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@(controllerAction == "RaceEventManage" ? "active" : "")">
+                        <a href="@Url.Action("Manage", "RaceEvent")"><i class="fa fa-table"></i> <span>Manage</span></a>
+                    </li>
+                    <li class="@(controllerAction == "RaceEventCreate" ? "active" : "")">
+                        <a href="@Url.Action("Create", "RaceEvent")"><i class="fa fa-plus-circle"></i> <span>Create</span></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="treeview @(controller == "PitStop" ? "active menu-open" : "")">
+                <a href="#">
+                    <i class="fa fa-flag-checkered"></i> <span>Pit Stop</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@(controllerAction == "PitStopManage" ? "active" : "")">
+                        <a href="@Url.Action("Manage", "PitStop")"><i class="fa fa-table"></i> <span>Manage</span></a>
+                    </li>
+                    <li class="@(controllerAction == "PitStopCreate" ? "active" : "")">
+                        <a href="@Url.Action("Create", "PitStop")"><i class="fa fa-plus-circle"></i> <span>Create</span></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="treeview @(controller == "Team" ? "active menu-open" : "")">
+                <a href="#">
+                    <i class="fa fa-users"></i> <span>Team</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@(controllerAction == "TeamManage" ? "active" : "")">
+                        <a href="@Url.Action("Manage", "Team")"><i class="fa fa-table"></i> <span>Manage</span></a>
+                    </li>
+                    <li class="@(controllerAction == "TeamCreate" ? "active" : "")">
+                        <a href="@Url.Action("Create", "Team")"><i class="fa fa-plus-circle"></i> <span>Create</span></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+
+</aside>

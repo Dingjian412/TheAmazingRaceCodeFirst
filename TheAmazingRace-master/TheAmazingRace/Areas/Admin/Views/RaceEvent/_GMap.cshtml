@@ -1,0 +1,35 @@
+﻿<h1>testing</h1>
+<style>
+    #map {
+        height: 200px;
+        width: 400px;
+    }
+</style>
+
+<p id="map"></p>
+
+@section scripts{
+    <script src="/Scripts/jquery-1.10.2.min.js"></script>
+    @*<script src="/Scripts/jquery.signalR-2.2.3.min.js"></script>
+    <script src="@signalRHubsUrl"></script>*@
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBqHbZPyZGbYZJ8nsWrn4tv01vALd-mtA&callback=initMap"></script>
+
+    <script>
+        var map;
+        var uluru = { lat: 1.349131, lng: 103.850148 };
+        var myTable;
+        var teamMarker = [];
+        debugger;
+
+        $(document).ready(function () { initMap()});
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'),
+                {
+                    center: uluru,
+                    zoom: 10
+                });
+        }
+    </script>
+}
+

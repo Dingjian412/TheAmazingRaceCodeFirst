@@ -1,0 +1,94 @@
+﻿@model TheAmazingRace.Areas.Admin.Models.CreateUserViewModel
+@using TheAmazingRace.Controllers;
+
+@{
+    ViewBag.Title = "Create Participant";
+}
+
+@using (Html.BeginForm("Create", "Participant", FormMethod.Post, new { role = "form", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-6 col-lg-5">
+            @if (TempData["MessageAlert"] != null)
+            {
+                var message = (Alert)TempData["MessageAlert"];
+                <div class="alert @message.CssClass alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h4><i class="icon fa fa-check"></i> @message.Title</h4>
+                    @message.Message
+                </div>
+            }
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AppUser.FirstName)
+                        @Html.EditorFor(model => model.AppUser.FirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "First name" } })
+                        @Html.ValidationMessageFor(model => model.AppUser.FirstName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AppUser.LastName)
+                        @Html.EditorFor(model => model.AppUser.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "Last name" } })
+                        @Html.ValidationMessageFor(model => model.AppUser.LastName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AppUser.DOB)
+                        @Html.EditorFor(model => model.AppUser.DOB, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.AppUser.DOB, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AppUser.Gender)
+                        @Html.DropDownListFor(model => model.AppUser.Gender, (IEnumerable<SelectListItem>
+                           )ViewData["GenderOptions"], "Please select one", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.AppUser.Gender, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Email)
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter email" } })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Password)
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ConfirmPassword)
+                        @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profile picture</label>
+                        <input type="file" name="file" />
+                    </div>
+                </div>
+                <!-- /.box-body -->
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                </div>
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $("#submit-btn").click(() => $(".alert").hide());
+    </script>
+}

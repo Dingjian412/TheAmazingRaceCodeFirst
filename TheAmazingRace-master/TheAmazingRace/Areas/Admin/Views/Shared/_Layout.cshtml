@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+    @Styles.Render("~/Content/admin-css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/datatable-js")
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <!-- Main Header -->
+        <header class="main-header">
+
+            <!-- Logo -->
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini">TAR</span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg">The Amazing Race</span>
+            </a>
+
+            <!-- Header Navbar -->
+            @Html.Action("_HeaderNavBar", "Dashboard")
+
+        </header>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        @Html.Action("_SideNavBar", "Dashboard")
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1>
+                    @ViewBag.Title
+                    <small>@ViewBag.ShortDesc</small>
+                </h1>
+            </section>
+
+            <!-- Main content -->
+            <section class="content container-fluid">
+                @RenderBody()
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <!-- To the right -->
+            <div class="pull-right hidden-xs">
+                The Amazing Race
+            </div>
+            <!-- Default to the left -->
+            <strong>Copyright &copy; 2018.</strong> All Rights Reserved.
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/admin-js")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

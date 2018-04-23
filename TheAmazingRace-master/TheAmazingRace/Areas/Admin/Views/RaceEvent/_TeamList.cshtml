@@ -1,0 +1,82 @@
+﻿@model IEnumerable<TheAmazingRace.Models.Team>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="team-data-table" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TeamMembers)
+                            </th>
+                            <th>
+                                Additional Information
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @foreach(var member in item.TeamMembers)
+                                    {
+                                         <img src="@member.PhotoSource" class="img-circle" style="width:60px; margin:3px 5px;">
+                                    }
+                                </td>
+                                <td>
+                                    @foreach(var member in item.TeamMembers)
+                                    {
+                                         <b>@member.Name</b> <span>- @member.DOB - @member.Gender</span><br />
+                                    }
+                                </td>
+                                <td style="vertical-align:middle; text-align:center;">
+                                    <a onclick="addTeamToRace('@item.Id')" class="btn btn-success">Add to race</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#team-data-table').DataTable()
+    })
+
+    function addTeamToRace(id) {
+        var payload = {
+            raceEventId: @Session["RaceEventId"],
+            teamId: id
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Admin/RaceEvent/AddTeamToRace",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(payload)
+        }).always(function (data) {
+            if (data.status == 200) {
+                $('.modal-backdrop').remove();
+                setTimeout($("#team-management").replaceWith(data.responseText), 800);
+            } else {
+                alert("An error has occured. Please try again later!");
+            }
+        });
+    }
+</script>

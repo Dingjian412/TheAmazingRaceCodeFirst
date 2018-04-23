@@ -1,0 +1,96 @@
+﻿@model IEnumerable<TheAmazingRace.Models.RaceEventPitStopTeam>
+
+@{ 
+    var currentTeam = 0;
+}
+<div id="team-control-panel">
+    <div class="box box-danger">
+        <div class="box-header with-border">
+            <h3 class="box-title">Control Panel</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="box">
+                <div class="box-body no-padding">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Team Name</th>
+                            <th>Team Member</th>
+                            <th>Pit Stops</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            if (currentTeam != item.Team.Id)
+                            {
+                                currentTeam = item.Team.Id;
+                                var count = 0;
+
+                                <tr>
+                                    <td>@item.Team.Name</td>
+                                    <td>
+                                        @foreach (var member in item.Team.TeamMembers)
+                                        {
+                                            <img src="@member.PhotoSource" class="img-circle" style="width:60px; margin:3px 5px;">
+                                        }
+                                    </td>
+                                    <td>
+                                        @foreach (var item2 in Model)
+                                        {
+
+                                            if(currentTeam == item2.TeamId)
+                                            {
+                                                if (item2.CompletedOn != null)
+                                                {
+                                                    <button class="btn btn-success" disabled>@item2.PitStop.PitStopName <br /> @item2.CompletedOn</button>
+                                                }
+                                                else
+                                                {
+                                                    if(count == 0)
+                                                    {
+                                                        count += 1;
+                                                        <button class="btn btn-info" onclick="completePitStop(@item2.RaceEventId, @item2.PitStopId, @item2.TeamId, @item2.NoOfCompletedStop)">@item2.PitStop.PitStopName <br /> In progress</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-default" disabled>@item2.PitStop.PitStopName <br /> &nbsp;</button>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>
+
+<script>
+    function completePitStop(raceEventId, pitStopId, teamId, noOfCompletedStop) {
+        var payload = {
+            raceEventId:raceEventId,
+            pitStopId:pitStopId,
+            teamId:teamId,
+            currentPitStopOrder: noOfCompletedStop
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Admin/RaceEvent/CompletePitStop",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(payload)
+        }).always(function (data) {
+            if (data.status == 200) {
+                $("#team-control-panel").replaceWith(data.responseText);
+            } else {
+                alert("An error has occured. Please try again later!");
+            }
+        });
+    }
+</script>

@@ -1,0 +1,76 @@
+﻿@model IEnumerable<TheAmazingRace.Models.User>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="staff-data-table" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.FirstName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LastName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Gender)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FirstName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Gender)
+                                </td>
+                                <td>
+                                    <a onclick="addStafftoRace('@item.Id')" class="btn btn-success">Add to race</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#staff-data-table').DataTable()
+    })
+
+    function addStafftoRace(id) {
+        var payload = {
+            raceEventId: @Session["RaceEventId"],
+            staffId: id
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Admin/RaceEvent/AddStaffToRace",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(payload)
+        }).always(function (data) {
+            if (data.status == 200) {
+                $('.modal-backdrop').remove();
+                setTimeout($("#staff-management").replaceWith(data.responseText), 800);
+            } else {
+                alert("An error has occured. Please try again later!");
+            }
+        });
+    }
+</script>

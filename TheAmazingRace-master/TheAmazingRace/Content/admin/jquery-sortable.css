@@ -1,0 +1,31 @@
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ol.example li.placeholder {
+    position: relative;
+    /** More li styles **/
+}
+
+ol.example li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+
+ol#pitstop-drag {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+ol#pitstop-drag > li {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 12px;
+    border-radius: 3px;
+}

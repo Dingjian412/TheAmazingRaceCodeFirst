@@ -1,0 +1,60 @@
+﻿@model IEnumerable<TheAmazingRace.Models.PitStop>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="pitstop-data-table" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PitStopName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChallengeDescription)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Address)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PostalCode)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PitStopName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ChallengeDescription)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Address)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PostalCode)
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("AddPitStopToRace", "RaceEvent", new { raceEventId = Session["RaceEventId"], pitStopId = item.Id })" class="btn btn-success">Add to race</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#pitstop-data-table').DataTable()
+    })
+</script>

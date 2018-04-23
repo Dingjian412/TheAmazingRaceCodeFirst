@@ -1,0 +1,52 @@
+﻿@model TheAmazingRace.Models.User
+
+@{
+    ViewBag.Title = "Details Participant";
+    var profilePicSrc = Model.PhotoSource != null ? Model.PhotoSource : Url.Content("~/Content/img/default-avatar.jpg");
+}
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-6 col-lg-5">
+        <!-- general form elements -->
+        <div class="box box-primary">
+            <div class="box-body">
+                <div class="form-group">
+                    <img src="@profilePicSrc" class="img-circle img-responsive img-xs-center img-md-clear" alt="User Image" style="max-width:200px; width:100%; padding:10px 20px;" />
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FirstName)
+                    @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "First name", disabled = "disabled" } })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LastName)
+                    @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "Last name", disabled = "disabled" } })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DOB)
+                    @Html.EditorFor(model => model.DOB, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Gender)
+                    @Html.DropDownListFor(model => model.Gender, (IEnumerable<SelectListItem>
+                                                      )ViewData["GenderOptions"], "Please select one", new { @class = "form-control", disabled = "disabled" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Email)
+                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter email", disabled = "disabled" } })
+                </div>
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+                <a href="@Url.Action("Manage", "Participant")" class="btn btn-danger">Back to Manage</a>
+                <a href="@Url.Action("Edit", "Participant", new { id = Model.Id })" class="btn btn-primary">Edit</a>
+            </div>
+        </div>
+        <!-- /.box -->
+    </div>
+</div>

@@ -1,0 +1,144 @@
+﻿@model TheAmazingRace.Models.Team
+
+@{
+    ViewBag.Title = "Details";
+    var count = 0;
+    var updatedByName = "-";
+    var updatedOn = "-";
+}
+
+<div class="row">
+    <div class="col-md-3">
+
+        <!-- Profile Image -->
+        <div class="box box-primary">
+            <div class="box-body box-profile">
+                @*<img class="profile-user-img img-responsive img-circle" src="../../dist/img/user4-128x128.jpg" alt="User profile picture">*@
+
+                <h3 class="profile-username text-center">@Model.Name</h3>
+
+                <p class="text-muted text-center">@Model.Description</p>
+
+                <ul class="list-group list-group-unbordered">
+                    <li class="list-group-item">
+                        <b>No of participants</b> <a class="pull-right">@Model.TeamMembers.Count</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Created by</b> <a class="pull-right">@Model.CreatedBy.Name</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Created on</b> <a class="pull-right">@Model.CreatedOn</a>
+                    </li>
+                    @if (Model.UpdatedOn != null)
+                    {
+                        updatedByName = Model.UpdatedBy.Name;
+                        updatedOn = Model.UpdatedOn.ToString();
+                    }
+                    <li class="list-group-item">
+                        <b>Last updated by</b> <a class="pull-right">@updatedByName</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Last updated on</b> <a class="pull-right">@updatedOn</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Joined event</b> <a class="pull-right">@(Model.Event != null ? Model.Event.EventName : "-")</a>
+                    </li>
+                </ul>
+
+                <a href="#" class="btn btn-success btn-block"><b>Join race event</b></a>
+                @if (Model.TeamMembers.Count < 2)
+                {
+                    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#modal-default">
+                        <b>Add member</b>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-deafult btn-block" disabled>
+                        <b>Team is full</b>
+                    </button>
+                }
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+    @foreach (var item in Model.TeamMembers)
+    {
+        var profilePhoto = item.PhotoSource != null ? item.PhotoSource : Url.Content("~/Content/img/default-avatar.jpg");
+        count++;
+
+        var userUpdatedBy = item.UpdatedBy != null ? item.UpdatedBy.Name : "-";
+        var userUpdatedOn = item.UpdatedBy != null ? item.UpdatedOn.ToString() : "-";
+
+        <div class="col-md-3">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Member #@count</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <img class="profile-user-img img-responsive img-circle" src="@profilePhoto" alt="User profile picture">
+
+                    <h3 class="profile-username text-center">@item.Name</h3>
+
+                    <p class="text-muted text-center">@item.Gender</p>
+
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>Date of Birth</b> <a class="pull-right">@item.DOB.ToString("dd MMM yyyy")</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Created by</b> <a class="pull-right">@item.CreatedBy.Name</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Created on</b> <a class="pull-right">@item.CreatedOn</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Last updated by</b> <a class="pull-right">@userUpdatedBy</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Last updated on</b> <a class="pull-right">@userUpdatedOn</a>
+                        </li>
+                    </ul>
+
+                    <a href="@Url.Action("RemoveUserFromTeam", "Team", new { userId = item.Id })" class="btn btn-danger btn-block"><b>Remove from team</b></a>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog" style="width:80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body">
+                @Html.Action("_ParticipantList", "Team")
+            </div>
+            <div class="modal-footer" style="text-align:center;">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+@section Scripts {
+    @Scripts.Render("~/bundles/datatable-js")
+
+    <script>
+        $(function () {
+            $('#data-table').DataTable()
+        })
+    </script>
+}

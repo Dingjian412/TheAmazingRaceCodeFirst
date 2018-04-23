@@ -1,0 +1,143 @@
+﻿@model TheAmazingRace.Models.RaceEvent
+@using TheAmazingRace.Controllers
+@{
+    ViewBag.Title = "Create Race Event";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-6 col-lg-5">
+            @if (TempData["MessageAlert"] != null)
+            {
+                var message = (Alert)TempData["MessageAlert"];
+                <div class="alert @message.CssClass alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h4><i class="icon fa fa-check"></i> @message.Title</h4>
+                    @message.Message
+                </div>
+            }
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.EventName)
+                        @Html.EditorFor(model => model.EventName, new { htmlAttributes = new { @class = "form-control", placeholder = "Event name" } })
+                        @Html.ValidationMessageFor(model => model.EventName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.EventDate)
+                        @Html.EditorFor(model => model.EventDate, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.EventDate, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">Location Information</h3>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PostalCode)
+                        <div class="input-group" style="width:150px;">
+                            @Html.EditorFor(model => model.PostalCode, new { htmlAttributes = new { id = "txt-postal", @class = "form-control", maxlength = "6" } })
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-info btn-flat" id="btn-postal-code">Search</button>
+                            </span>
+                        </div>
+                        <p class="help-block">Press Search to populate the location information.</p>
+                        @Html.ValidationMessageFor(model => model.PostalCode, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Address)
+                        @Html.EditorFor(model => model.Address, new { htmlAttributes = new { id = "txt-address", @class = "form-control", placeholder = "Address" } })
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.StartLatitude)
+                                @Html.EditorFor(model => model.StartLatitude, new { htmlAttributes = new { id = "txt-lat", @class = "form-control", placeholder = "Latitude" } })
+                                @Html.ValidationMessageFor(model => model.StartLatitude, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.StartLongitude)
+                                @Html.EditorFor(model => model.StartLongitude, new { htmlAttributes = new { id = "txt-long", @class = "form-control", placeholder = "Longitude" } })
+                                @Html.ValidationMessageFor(model => model.StartLongitude, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AdditionalInfo)
+                        @Html.TextAreaFor(model => model.AdditionalInfo, new { @class = "form-control", placeholder = "Additional information" })
+                        @Html.ValidationMessageFor(model => model.AdditionalInfo, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <!-- /.box-body -->
+
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                </div>
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-default" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Search by postal code</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Searching for location. Please wait...</p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $("#btn-postal-code").click(function () {
+            var regex = new RegExp("[0-9]{6}");
+            var postal = $("#txt-postal").val();
+
+            if (regex.test(postal)) {
+                $("#modal-default").modal('show');
+                var oneMapAPI = "https://developers.onemap.sg/commonapi/search?searchVal=" + postal + "&returnGeom=Y&getAddrDetails=Y";
+                $.getJSON(oneMapAPI).done(function (data) {
+                    var results = data.results;
+
+                    setTimeout(function () { $("#modal-default").modal('hide'); }, 800);
+                    if (results.length > 0) {
+                        var info = results[0];
+                        $("#txt-address").val((info["BLK_NO"] + " " + info["ROAD_NAME"]).trim());
+                        $("#txt-lat").val(info["LATITUDE"]);
+                        $("#txt-long").val(info["LONGITUDE"]);
+                    } else {
+                        setTimeout(function () { alert("No address found!"); }, 500);
+                    }
+                })
+            } else {
+                alert("Invalid postal code");
+            }
+        })
+    </script>
+}

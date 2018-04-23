@@ -1,0 +1,41 @@
+﻿@model IEnumerable<TheAmazingRace.Models.RaceEventPitStopTeam>
+
+@{ 
+    var rank = 0;
+}
+<div>
+    <div class="box box-warning">
+        <div class="box-header with-border">
+            <h3 class="box-title">Leaderboard</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="box">
+                <div class="box-body no-padding">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team Name</th>
+                            <th>Team Member</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(rank += 1)</td>
+                                <td>@item.Team.Name</td>
+                                <td>
+                                    @foreach (var member in item.Team.TeamMembers)
+                                    {
+                                        <img src="@member.PhotoSource" class="img-circle" style="width:40px; margin:3px 5px;">
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>
