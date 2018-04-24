@@ -259,12 +259,26 @@ namespace TheAmazingRace.Areas.Admin.Controllers
 
         public JsonResult GetTeamLocation(int raceEventId)
         {
+            //var team = new List<TeamA>();
+            //TeamA team1 = new TeamA() { TeamId = 1, Name = "Team1", CurrentLat = 1.349131, CurrentLong = 103.850148 };
+            //TeamA team2 = new TeamA() { TeamId = 2, Name = "Team2", CurrentLat = 1.359131, CurrentLong = 103.860148 };
+            //team.Add(team1);
+            //team.Add(team2);
+            //return Json(team, JsonRequestBehavior.AllowGet);
+            var data = teamService.GetAllByRaceEventId(raceEventId);
             var team = new List<TeamA>();
-            TeamA team1 = new TeamA() { TeamId = 1, Name = "Team1", CurrentLat = 1.349131, CurrentLong = 103.850148 };
-            TeamA team2 = new TeamA() { TeamId = 2, Name = "Team2", CurrentLat = 1.359131, CurrentLong = 103.860148 };
-            team.Add(team1);
-            team.Add(team2);
+            foreach (Team t in data)
+            {
+                TeamA ta = new TeamA();
+                ta.TeamId = t.Id;
+                ta.Name = t.Name;
+                ta.CurrentLat = t.CurrentLat;
+                ta.CurrentLong = t.CurrentLong;
+                team.Add(ta);
+            }
+
             return Json(team, JsonRequestBehavior.AllowGet);
+
             //var data = teamService.GetAllByRaceEventId(raceEventId);
             //return Json(data, JsonRequestBehavior.AllowGet);
         }
